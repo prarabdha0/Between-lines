@@ -1,140 +1,88 @@
 import streamlit as st
 import pandas as pd
-import random
 
 st.set_page_config(
-    page_title="A Window Into My Soul",
-    page_icon="🌙",
+    page_title="Ink & Silence",
+    page_icon="📜",
     layout="centered"
 )
 
+# ----------------- STYLE -----------------
 st.markdown("""
 <style>
 
 .stApp {
-    background-color: #0f172a;
+    background-color: #f6f1e7;  /* warm paper */
+    color: #2b2b2b;
+    font-family: "Georgia", serif;
 }
 
-h1,h2,h3,p {
-    color: white;
+/* Title */
+h1 {
+    text-align: center;
+    color: #3b2f2f;
+    font-weight: 400;
+    letter-spacing: 1px;
 }
 
-.poem-box {
-    background-color: rgba(255,255,255,0.05);
-    padding: 25px;
-    border-radius: 18px;
-    margin-top: 15px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
+/* Shayari card */
+.poem {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #e6dccf;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
 }
 
-.quote {
-    color: white;
-    font-size: 22px;
-    line-height: 1.9;
+/* Shayari text */
+.text {
+    font-size: 20px;
+    line-height: 1.8;
+    color: #2f2a26;
+    white-space: pre-wrap;
 }
 
+/* Author */
 .author {
-    color: #cbd5e1;
     text-align: right;
+    margin-top: 10px;
     font-style: italic;
+    color: #6b5e55;
+    font-size: 14px;
 }
 
-.reflection {
-    color: #f8fafc;
-    margin-top: 15px;
-    font-size: 15px;
+/* tiny separator like journal ink mark */
+.sep {
+    text-align: center;
+    color: #c9b8a8;
+    margin: 10px 0;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🌙 A Window Into My Soul")
+# ----------------- HEADER -----------------
+st.title("Ink & Silence")
 
 st.markdown("""
-These are not necessarily the greatest shayaris ever written.
+<div style='text-align:center; color:#6b5e55; margin-top:-10px'>
+A collection of shayari that stayed when everything else passed.
+</div>
+""", unsafe_allow_html=True)
 
-They are the ones that stayed.
+st.markdown("<br>", unsafe_allow_html=True)
 
-The ones that understood me before I understood myself.
-""")
-
-st.divider()
-
+# ----------------- LOAD DATA -----------------
 df = pd.read_csv("shayari.csv")
 
-if len(df) > 0:
+# ----------------- DISPLAY -----------------
+for _, row in df.iterrows():
 
-    poem = df.sample(1).iloc[0]
-
-    st.subheader("✨ Shayari of the Visit")
-
-    st.markdown(
-        f"""
-        <div class='poem-box'>
-        <div class='quote'>
-        {poem['shayari']}
-        </div>
-        <br>
-        <div class='author'>
-        — {poem['author']}
-        </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-st.divider()
-
-st.header("Browse My Collection")
-
-categories = ["All"] + sorted(df["category"].dropna().unique().tolist())
-
-selected = st.selectbox(
-    "Choose a chapter",
-    categories
-)
-
-if selected != "All":
-    display_df = df[df["category"] == selected]
-else:
-    display_df = df
-
-for _, row in display_df.iterrows():
-
-    st.markdown(
-        f"""
-        <div class='poem-box'>
-        <div class='quote'>
-        {row['shayari']}
-        </div>
-
-        <br>
-
-        <div class='author'>
-        — {row['author']}
-        </div>
-
-        <div class='reflection'>
-        💭 {row['reflection']}
-        </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-st.divider()
-
-st.header("About This Collection")
-
-st.write("""
-Every poem here has left a mark on me.
-
-Some describe people I met.
-
-Some describe people I lost.
-
-Some describe versions of myself.
-
-Together they tell a story I could never tell directly.
-""")
+    st.markdown(f"""
+    <div class="poem">
+        <div class="text">{row['shayari']}</div>
+        <div class="sep">✦ ✦ ✦</div>
+        <div class="author">— {row['author']}</div>
+    </div>
+    """, unsafe_allow_html=True)
