@@ -1,98 +1,83 @@
 import streamlit as st
 import pandas as pd
+import base64
 
 st.set_page_config(
     page_title="Between Lines",
-    page_icon="",
+    page_icon="🌙",
     layout="centered"
 )
 
-# ---------------- BACKGROUND + SPARKLE EFFECT ----------------
-st.markdown("""
-<style>
+# ---------------- BACKGROUND IMAGE (for sparkle illusion) ----------------
+def add_bg():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-color: #f3eadc;
+            font-family: Georgia, serif;
+            color: #2b2b2b;
+        }
 
-/* soft brown paper background */
-.stApp {
-    background: #f3eadc;
-    color: #2b2b2b;
-    font-family: "Georgia", serif;
-    overflow-x: hidden;
-}
+        /* soft floating glow effect (works in Streamlit) */
+        .stApp::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 40%),
+                        radial-gradient(circle at 80% 30%, rgba(255,215,160,0.25), transparent 45%),
+                        radial-gradient(circle at 50% 80%, rgba(255,255,255,0.2), transparent 50%);
+            animation: floatGlow 10s ease-in-out infinite alternate;
+        }
 
-/* floating sparkles layer */
-.stApp::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    background: transparent;
-    background-image: radial-gradient(#c9a86a 1px, transparent 1px),
-                      radial-gradient(#ffffff 1px, transparent 1px);
-    background-size: 60px 60px, 90px 90px;
-    background-position: 0 0, 30px 30px;
-    animation: sparkleMove 18s linear infinite;
-    opacity: 0.25;
-}
+        @keyframes floatGlow {
+            0% { transform: scale(1) translateY(0px); }
+            100% { transform: scale(1.05) translateY(-10px); }
+        }
 
-@keyframes sparkleMove {
-    0% { transform: translateY(0px); }
-    100% { transform: translateY(-80px); }
-}
+        .poem {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid #e7dccb;
+            padding: 22px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+            backdrop-filter: blur(2px);
+        }
 
-/* intro text */
-.intro {
-    text-align: center;
-    font-size: 16px;
-    color: #5a4a3b;
-    margin-top: 30px;
-    margin-bottom: 40px;
-    line-height: 2;
-}
+        .text {
+            font-size: 22px;
+            line-height: 2.3;
+            white-space: pre-wrap;
+            color: #2c2520;
+        }
 
-/* shayari block */
-.poem {
-    background: rgba(255,255,255,0.55);
-    border: 1px solid #e7dccb;
-    padding: 22px;
-    border-radius: 14px;
-    margin-bottom: 18px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-    backdrop-filter: blur(2px);
-}
+        .author {
+            text-align: right;
+            margin-top: 12px;
+            color: #7a6656;
+            font-style: italic;
+        }
 
-/* Urdu text styling */
-.text {
-    font-size: 22px;
-    line-height: 2.2;
-    color: #2c2520;
-    white-space: pre-wrap;   /* IMPORTANT: keeps Urdu line breaks */
-    font-style: italic;
-    direction: auto;
-}
+        .intro {
+            text-align: center;
+            margin-top: 25px;
+            margin-bottom: 35px;
+            color: #5a4a3b;
+            line-height: 2;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-/* author */
-.author {
-    text-align: right;
-    margin-top: 12px;
-    font-style: italic;
-    color: #7a6656;
-}
+add_bg()
 
-/* divider */
-.sep {
-    text-align: center;
-    color: #c8b7a3;
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------- INTRO (NO TITLE) ----------------
+# ---------------- INTRO ----------------
 st.markdown("""
 <div class="intro">
 For people that I met ·  
@@ -102,16 +87,17 @@ between the lines ·
 </div>
 """, unsafe_allow_html=True)
 
-# ---------------- LOAD DATA ----------------
-df = pd.read_csv("shayari.csv")
+# ---------------- LOAD CSV (UTF-8 FIX) ----------------
+df = pd.read_csv("shayari.csv", encoding="utf-8")
 
-# ---------------- DISPLAY SHAYARI ----------------
+# ---------------- DISPLAY ----------------
 for _, row in df.iterrows():
+
+    shayari = str(row["shayari"]).replace("\\n", "\n")
 
     st.markdown(f"""
     <div class="poem">
-        <div class="text">{row['shayari']}</div>
-        <div class="sep">✦</div>
+        <div class="text">{shayari}</div>
         <div class="author">— {row['author']}</div>
     </div>
     """, unsafe_allow_html=True)
